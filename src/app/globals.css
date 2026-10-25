@@ -1,0 +1,254 @@
+@import "tailwindcss";
+
+/*
+ * House of Design — the questionnaire PDF, alive.
+ * White paper, near-black ink, one clay accent. Old-style serif for prompts,
+ * Lato for everything you read and type. Dotted answer lines, as on the page.
+ */
+
+@theme {
+  --color-paper: #ffffff;
+  --color-paper-2: #f8f6f4;
+  --color-ink: #24201e;
+  --color-ink-2: #5b5450;
+  --color-ink-3: #6f6762;
+  --color-rule: #e4dfda;
+  --color-dot: #c9c1ba;
+  --color-clay: #8f553f;
+  --color-clay-deep: #6f3f2d;
+  --color-clay-wash: #f6eeea;
+  --color-danger: #a33a2a;
+
+  --font-serif: var(--font-source-serif), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-lato), "Segoe UI", system-ui, sans-serif;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+    --answer-line: 2rem;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scrollbar-color: var(--color-dot) transparent;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "kern", "liga";
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background: var(--color-clay-wash);
+    color: var(--color-clay-deep);
+  }
+
+  input,
+  textarea {
+    caret-color: var(--color-clay);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-clay);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  a {
+    text-underline-offset: 0.22em;
+    text-decoration-thickness: 1px;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Answer lines: the PDF's dotted rules, scrolling with the text.     */
+/* ------------------------------------------------------------------ */
+
+.answer-lines {
+  line-height: var(--answer-line);
+  background-image: radial-gradient(circle at 1px 1px, var(--color-dot) 0.75px, transparent 1px);
+  background-size: 4px var(--answer-line);
+  background-position: 0 calc(var(--answer-line) - 6px);
+  background-repeat: repeat;
+  background-attachment: local;
+  background-origin: content-box;
+  background-clip: content-box;
+}
+
+.answer-lines::placeholder {
+  color: var(--color-ink-3);
+  opacity: 1;
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion. One grammar: things arrive like a title card — out of a    */
+/* soft focus, settling upward on an exponential ease.                */
+/* ------------------------------------------------------------------ */
+
+@keyframes focus-in {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(0.45em);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes draw-rule {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes track-in {
+  from {
+    opacity: 0;
+    letter-spacing: 0.9em;
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    letter-spacing: 0.32em;
+    filter: blur(0);
+  }
+}
+
+@keyframes wipe-up {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
+@keyframes leave {
+  to {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(-0.35em);
+  }
+}
+
+.reveal-word {
+  display: inline-block;
+  animation: focus-in 1000ms var(--ease-out-expo) both;
+  animation-delay: calc(var(--delay, 0ms) + min(var(--i, 0), 36) * 26ms);
+}
+
+.reveal {
+  animation: fade-up 800ms var(--ease-out-expo) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+.reveal-focus {
+  animation: focus-in 1100ms var(--ease-out-expo) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+.rule-draw {
+  transform-origin: left center;
+  animation: draw-rule 1400ms var(--ease-out-expo) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+.wordmark-in {
+  animation: track-in 1800ms var(--ease-out-expo) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+.chapter-card {
+  animation: wipe-up 900ms var(--ease-in-out-quart) forwards;
+  animation-delay: var(--hold, 1500ms);
+}
+
+.screen-leave {
+  animation: leave 260ms ease-in forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal-word,
+  .reveal,
+  .reveal-focus,
+  .wordmark-in {
+    animation: fade-up 1ms linear both;
+  }
+  .rule-draw {
+    animation: none;
+  }
+  .screen-leave {
+    animation: none;
+    opacity: 0;
+  }
+  .chapter-card {
+    animation-duration: 1ms;
+  }
+}
+
+/* Recording level meter bars */
+.meter-bar {
+  transform-origin: center;
+  transition: transform 90ms linear;
+}
+
+/* Range input used by the audio player */
+.scrub {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  height: 1.5rem;
+  cursor: pointer;
+}
+.scrub::-webkit-slider-runnable-track {
+  height: 2px;
+  background: linear-gradient(to right, var(--color-clay) var(--progress, 0%), var(--color-rule) var(--progress, 0%));
+}
+.scrub::-moz-range-track {
+  height: 2px;
+  background: var(--color-rule);
+}
+.scrub::-moz-range-progress {
+  height: 2px;
+  background: var(--color-clay);
+}
+.scrub::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px;
+  height: 12px;
+  margin-top: -5px;
+  border-radius: 50%;
+  background: var(--color-clay);
+}
+.scrub::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-clay);
+}
